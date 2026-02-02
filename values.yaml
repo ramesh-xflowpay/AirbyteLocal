@@ -1,0 +1,40 @@
+mysql:
+  image: mysql:8.0
+  rootPassword: rootpassword
+  user: debezium
+  password: dbz
+  database: inventory
+
+minio:
+  image: minio/minio
+  rootUser: admin
+  rootPassword: password
+  bucket: warehouse
+
+mc:
+  image: minio/mc
+
+rest:
+  image: apache/iceberg-rest-fixture
+  environment:
+    awsAccessKeyId: admin
+    awsSecretAccessKey: password
+    awsRegion: us-east-1
+    catalogWarehouse: s3a://warehouse/
+    catalogIoImpl: org.apache.iceberg.aws.s3.S3FileIO
+    catalogS3Endpoint: http://minio.airbyte-v2.svc.cluster.local:9000
+    catalogS3PathStyleAccess: "true"
+
+
+# nessie:
+#   image: projectnessie/nessie:latest
+#   port: 19120
+#   logLevel: DEBUG
+#   profile: prod
+#   warehouse: warehouse
+#   s3:
+#     endpoint: http://minio:9000
+#     accessKey: admin
+#     secretKey: password
+#     pathStyleAccess: true
+#     region: us-east-1

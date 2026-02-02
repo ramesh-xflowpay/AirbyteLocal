@@ -1,0 +1,6 @@
+apiVersion: v2
+name: airbyte-dependencies
+description: External MySQL and MinIO dependencies for Airbyte
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

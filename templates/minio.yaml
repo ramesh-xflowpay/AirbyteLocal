@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minio
+spec:
+  selector:
+    matchLabels:
+      app: minio
+  template:
+    metadata:
+      labels:
+        app: minio
+    spec:
+      containers:
+      - name: minio
+        image: {{ .Values.minio.image }}
+        args: ["server", "/data", "--console-address", ":9001"]
+        env:
+        - name: MINIO_ROOT_USER
+          value: {{ .Values.minio.rootUser }}
+        - name: MINIO_ROOT_PASSWORD
+          value: {{ .Values.minio.rootPassword }}
+        ports:
+        - containerPort: 9000
+        - containerPort: 9001
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio
+spec:
+  ports:
+  - name: api
+    port: 9000
+  - name: console
+    port: 9001
+  selector:
+    app: minio
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: minio-setup
+spec:
+  template:
+    spec:
+      containers:
+      - name: mc
+        image: {{ .Values.mc.image }}
+        command: ["/bin/sh", "-c"]
+        args:
+          - |
+            until (/usr/bin/mc alias set myminio http://minio:9000 {{ .Values.minio.rootUser }} {{ .Values.minio.rootPassword }}) do echo 'waiting for minio...' && sleep 2; done;
+            /usr/bin/mc mb --ignore-existing myminio/{{ .Values.minio.bucket }};
+            /usr/bin/mc anonymous set public myminio/{{ .Values.minio.bucket }};
+      restartPolicy: OnFailure
