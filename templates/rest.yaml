@@ -24,6 +24,10 @@ spec:
           value: {{ .Values.rest.environment.awsSecretAccessKey }}
         - name: AWS_REGION
           value: {{ .Values.rest.environment.awsRegion }}
+        - name: AWS_S3_US_EAST_1_REGIONAL_ENDPOINT
+          value: "regional"
+        - name: AWS_ENDPOINT_URL_S3
+          value: {{ .Values.rest.environment.catalogS3Endpoint }}
         - name: CATALOG_WAREHOUSE
           value: {{ .Values.rest.environment.catalogWarehouse }}
         - name: CATALOG_IO__IMPL
@@ -32,14 +36,23 @@ spec:
           value: {{ .Values.rest.environment.catalogS3Endpoint }}
         - name: CATALOG_S3_PATH_STYLE_ACCESS
           value: "{{ .Values.rest.environment.catalogS3PathStyleAccess }}"
+        - name: CATALOG_S3_SSL_ENABLED
+          value: "{{ .Values.rest.environment.catalogS3SslEnabled }}"
+        - name: CATALOG_S3_ACCESS_KEY_ID
+          value: {{ .Values.rest.environment.awsAccessKeyId }}
+        - name: CATALOG_S3_SECRET_ACCESS_KEY
+          value: {{ .Values.rest.environment.awsSecretAccessKey }}
+        - name: JAVA_TOOL_OPTIONS
+          value: "-Dcom.amazonaws.sdk.disableEc2Metadata=true -Dcom.amazonaws.s3.enablePathStyleAccess=true"
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: iceberg-rest
 spec:
-  ports:
-  - port: 8181
-    targetPort: 8181
   selector:
     app: iceberg-rest
+  ports:
+  - protocol: TCP
+    port: 8181
+    targetPort: 8181
