@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nessie
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nessie
+  template:
+    metadata:
+      labels:
+        app: nessie
+    spec:
+      containers:
+      - name: nessie
+        image: {{ .Values.nessie.image }}
+        env:
+        - name: QUARKUS_PROFILE
+          value: {{ .Values.nessie.profile }}
+        - name: QUARKUS_HTTP_PORT
+          value: "{{ .Values.nessie.port }}"
+        - name: QUARKUS_LOG_LEVEL
+          value: {{ .Values.nessie.logLevel }}
+        - name: QUARKUS_OTEL_SDK_DISABLED
+          value: "true"
+        - name: NESSIE_CATALOG_DEFAULT_WAREHOUSE
+          value: {{ .Values.nessie.warehouse }}
+        - name: NESSIE_SERVER_AUTHENTICATION_ENABLED
+          value: "false"
+        - name: NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_ENDPOINT
+          value: {{ .Values.nessie.s3.endpoint }}
+        - name: NESSIE_VERSION_STORE_TYPE
+          value: "IN_MEMORY"
+        - name: NESSIE_CATALOG_WAREHOUSES_WAREHOUSE_LOCATION
+          value: "s3a://{{ .Values.minio.bucket }}/"
+        - name: NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_ACCESS_KEY
+          value: "urn:nessie-secret:quarkus:nessie.catalog.secrets.access-key"
+        - name: NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_PATH_STYLE_ACCESS
+          value: "true"
+        - name: NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_AUTH_TYPE
+          value: "STATIC"
+        - name: NESSIE_CATALOG_SECRETS_ACCESS_KEY_NAME
+          value: {{ .Values.nessie.s3.accessKey }}
+        - name: NESSIE_CATALOG_SECRETS_ACCESS_KEY_SECRET
+          value: {{ .Values.nessie.s3.secretKey }}
+        - name: NESSIE_CATALOG_SERVICE_S3_DEFAULT_OPTIONS_REGION
+          value: {{ .Values.nessie.s3.region }}
+        - name: NESSIE_CLIENT_API_VERSION
+          value: "2"
+        - name: NESSIE_REST_API_VERSION
+          value: "2"
+        ports:
+        - containerPort: {{ .Values.nessie.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: nessie
+spec:
+  ports:
+  - name: api
+    port: {{ .Values.nessie.port }}
+    targetPort: {{ .Values.nessie.port }}
+  selector:
+    app: nessie
