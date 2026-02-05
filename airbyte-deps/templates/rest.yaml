@@ -24,26 +24,18 @@ spec:
           value: {{ .Values.rest.environment.awsSecretAccessKey }}
         - name: AWS_REGION
           value: {{ .Values.rest.environment.awsRegion }}
-        - name: AWS_S3_US_EAST_1_REGIONAL_ENDPOINT
-          value: "regional"
-        - name: AWS_ENDPOINT_URL_S3
-          value: {{ .Values.rest.environment.catalogS3Endpoint }}
         - name: CATALOG_WAREHOUSE
           value: {{ .Values.rest.environment.catalogWarehouse }}
         - name: CATALOG_IO__IMPL
           value: {{ .Values.rest.environment.catalogIoImpl }}
         - name: CATALOG_S3_ENDPOINT
           value: {{ .Values.rest.environment.catalogS3Endpoint }}
-        - name: CATALOG_S3_PATH_STYLE_ACCESS
-          value: "{{ .Values.rest.environment.catalogS3PathStyleAccess }}"
-        - name: CATALOG_S3_SSL_ENABLED
-          value: "{{ .Values.rest.environment.catalogS3SslEnabled }}"
-        - name: CATALOG_S3_ACCESS_KEY_ID
+        - name: CATALOG_S3_PATH__STYLE__ACCESS
+          value: "true"
+        - name: CATALOG_S3_ACCESS__KEY__ID
           value: {{ .Values.rest.environment.awsAccessKeyId }}
-        - name: CATALOG_S3_SECRET_ACCESS_KEY
+        - name: CATALOG_S3_SECRET__ACCESS__KEY
           value: {{ .Values.rest.environment.awsSecretAccessKey }}
-        - name: JAVA_TOOL_OPTIONS
-          value: "-Dcom.amazonaws.sdk.disableEc2Metadata=true -Dcom.amazonaws.s3.enablePathStyleAccess=true"
 ---
 apiVersion: v1
 kind: Service
